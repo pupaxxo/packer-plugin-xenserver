@@ -15,6 +15,7 @@ import (
 type stepCreateInstance struct {
 	instance *xsclient.VMRef
 	vdi      *xsclient.VDIRef
+  dataVdi  *xsclient.VDIRef
 }
 
 func (self *stepCreateInstance) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
@@ -134,6 +135,29 @@ func (self *stepCreateInstance) Run(ctx context.Context, state multistep.StateBa
 		return multistep.ActionHalt
 	}
 
+  dataVdi, err := c.GetClient().VDI.Create(c.GetSessionRef(), xenapi.VDIRecord{
+     NameLabel:   "Packer-disk-data",
+     VirtualSize: int(config.DataDiskSize * 1024 * 1024),
+     Type:        "user",
+     Sharable:    false,
+     ReadOnly:    false,
+     SR:          sr,
+     OtherConfig: map[string]string{
+       "temp": "temp",
+     },
+  })
+  if err != nil {
+     ui.Error(fmt.Sprintf("Unable to create packer disk VDI: %s", err.Error()))
+     return multistep.ActionHalt
+  }
+  self.dataVdi = &dataVdi
+
+  err = xscommon.ConnectVdi(c, instance, dataVdi, xsclient.VbdTypeDisk)
+  if err != nil {
+     ui.Error(fmt.Sprintf("Unable to connect packer disk VDI: %s", err.Error()))
+     return multistep.ActionHalt
+  }
+
 	// Connect Network
 
 	var network xsclient.NetworkRef
@@ -238,6 +262,14 @@ func (self *stepCreateInstance) Cleanup(state multistep.StateBag) {
 	if self.vdi != nil {
 		ui.Say("Destroying VDI")
 		err := c.GetClient().VDI.Destroy(c.GetSessionRef(), *self.vdi)
+		if err != nil {
+			ui.Error(err.Error())
+		}
+	}
+
+  if self.dataVdi != nil {
+		ui.Say("Destroying VDI")
+		err := c.GetClient().VDI.Destroy(c.GetSessionRef(), *self.dataVdi)
 		if err != nil {
 			ui.Error(err.Error())
 		}

@@ -98,6 +98,7 @@ type FlatConfig struct {
 	VMMemory                  *uint             `mapstructure:"vm_memory" cty:"vm_memory" hcl:"vm_memory"`
 	DiskSize                  *uint             `mapstructure:"disk_size" cty:"disk_size" hcl:"disk_size"`
   DataDiskSize              *uint             `mapstructure:"data_disk_size" cty:"data_disk_size" hcl:"data_disk_size"`
+  AdditionalDataDiskSize    *uint             `mapstructure:"additional_data_disk_size" cty:"additional_data_disk_size" hcl:"additional_data_disk_size"`
 	CloneTemplate             *string           `mapstructure:"clone_template" cty:"clone_template" hcl:"clone_template"`
 	VMOtherConfig             map[string]string `mapstructure:"vm_other_config" cty:"vm_other_config" hcl:"vm_other_config"`
 	ISOChecksum               *string           `mapstructure:"iso_checksum" cty:"iso_checksum" hcl:"iso_checksum"`
@@ -210,6 +211,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"vm_memory":                    &hcldec.AttrSpec{Name: "vm_memory", Type: cty.Number, Required: false},
 		"disk_size":                    &hcldec.AttrSpec{Name: "disk_size", Type: cty.Number, Required: false},
     "data_disk_size":               &hcldec.AttrSpec{Name: "data_disk_size", Type: cty.Number, Required: false},
+    "additional_data_disk_size":    &hcldec.AttrSpec{Name: "additional_data_disk_size", Type: cty.Number, Required: false},
 		"clone_template":               &hcldec.AttrSpec{Name: "clone_template", Type: cty.String, Required: false},
 		"vm_other_config":              &hcldec.AttrSpec{Name: "vm_other_config", Type: cty.Map(cty.String), Required: false},
 		"iso_checksum":                 &hcldec.AttrSpec{Name: "iso_checksum", Type: cty.String, Required: false},

@@ -19,6 +19,7 @@ type Config struct {
 	VMMemory       uint              `mapstructure:"vm_memory"`
 	DiskSize       uint              `mapstructure:"disk_size"`
   DataDiskSize   uint              `mapstructure:"data_disk_size"`
+  AdditionalDataDiskSize   uint              `mapstructure:"additional_data_disk_size"`
 	CloneTemplate  string            `mapstructure:"clone_template"`
 	VMOtherConfig  map[string]string `mapstructure:"vm_other_config"`
 
